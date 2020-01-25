@@ -11,24 +11,31 @@ import matplotlib.pyplot as plt
 #How to create a random array
 #df = pd.DataFrame(np.random.randint(0,20,size=(20, 2)), columns=list('AB'))
 cols=['Date', 'Time', 'Open','High','Low','Last']
-dfd = pd.read_csv('data/4hMFE.csv',skipinitialspace=True, usecols = cols)
-dfd=dfd.tail(78)
-#dfd['Slope_Upper']=np.nan
-#dfd.reset_index(inplace=True)
+df = pd.read_csv('data/4hMFE.csv',skipinitialspace=True, usecols = cols)
+df=df.tail(78)
+df.reset_index(drop=False,inplace=True )
 
 # data
-x = dfd.index
-y = dfd['High']
+x = df.index
+y = df['High']
 
 # Find the slope and intercept of the best fit line
 slope, intercept = np.polyfit(x, y, 1)
-#Place them into new columns
-dfd['std_Deviation'] = [slope * i + intercept for i in x]
 
+#Find the slopes and plce them into new columns
+df['std_Deviation'] = [slope * i + intercept for i in x]
+df['SLU_Max'] = (df['High'] - df['std_Deviation'])
+df['SLU_Min'] = (df['std_Deviation']-df['Low']).max()
+#Put the slope into the dataframe
+df['Slope_Upper'] = [(slope * i + intercept)+((df['High'] - df['std_Deviation']).max()) for i in x]
+df['Slope_Lower'] = [(slope * i + intercept)-(df['SLU_Min'].max()) for i in x]
 
-dfd['Slope_Upper'] = [(slope * i + intercept)+0.005 for i in x]
-dfd['Slope_Lower'] = [(slope * i + intercept)-0.005 for i in x]
     
+#Get data of only highs above deviation and low below deviation
+x1=df.loc[df['High'] >= df['std_Deviation']]
+x2=df.loc[df['Low'] < df['std_Deviation']]
+
+x3 = x1.loc[x1['SLU_Max'] == x1['SLU_Max'].max()]
 
 #Set the main figure proportions
 fig = plt.figure(figsize=(20,10))
@@ -36,13 +43,13 @@ fig.subplots_adjust(hspace=0.3)
 ax1 = fig.add_subplot(111)
 
 # Plot the best fit line over the actual values
-ax1.scatter(x, y, marker='.')
-plt.scatter(x, y)
-plt.plot(x, dfd['std_Deviation'], 'r')
-plt.plot(x, dfd['Slope_Upper'], 'g')
-plt.plot(x, dfd['Slope_Lower'], 'b')
+#ax1.scatter(x, y, marker='.')
+ax1.scatter(x1.index, x1['High'], marker='.') #Plot only highs above std deviation line
+ax1.scatter(x2.index, x2['Low'], marker='.')#Plot only Lows below std deviation line
+plt.plot(x, df['std_Deviation'], 'r')
+plt.plot(x, df['Slope_Upper'], 'g')
+plt.plot(x, df['Slope_Lower'], 'b')
 plt.title(slope)
 plt.show()
-
 
 
