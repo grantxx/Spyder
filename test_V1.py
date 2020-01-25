@@ -22,31 +22,34 @@ y = df['High']
 # Find the slope and intercept of the best fit line
 slope, intercept = np.polyfit(x, y, 1)
 
-#Find the slops and plce them into new columns
+#Find the slopes and plce them into new columns
 df['std_Deviation'] = [slope * i + intercept for i in x]
-
-#Do some calculation to determine upper and lower extremes
-
-_hdh = (df['High'] - df['std_Deviation']).max()        
-_hdl = (df['std_Deviation']-df['Low']).max()
-
+df['SLU_Max'] = (df['High'] - df['std_Deviation'])
+df['SLU_Min'] = (df['std_Deviation']-df['Low']).max()
 #Put the slope into the dataframe
-df['Slope_Upper'] = [(slope * i + intercept)+_hdh for i in x]
-df['Slope_Lower'] = [(slope * i + intercept)-_hdl for i in x]
+df['Slope_Upper'] = [(slope * i + intercept)+((df['High'] - df['std_Deviation']).max()) for i in x]
+df['Slope_Lower'] = [(slope * i + intercept)-(df['SLU_Min'].max()) for i in x]
+
     
+#Get data of only highs above deviation and low below deviation
+x1=df.loc[df['High'] >= df['std_Deviation']]
+x2=df.loc[df['Low'] < df['std_Deviation']]
+
+x3 = x1.loc[x1['SLU_Max'] == x1['SLU_Max'].max()]
+
 #Set the main figure proportions
 fig = plt.figure(figsize=(20,10))
 fig.subplots_adjust(hspace=0.3)
 ax1 = fig.add_subplot(111)
 
 # Plot the best fit line over the actual values
-ax1.scatter(x, y, marker='.')
-plt.scatter(x, y)
+#ax1.scatter(x, y, marker='.')
+ax1.scatter(x1.index, x1['High'], marker='.') #Plot only highs above std deviation line
+ax1.scatter(x2.index, x2['Low'], marker='.')#Plot only Lows below std deviation line
 plt.plot(x, df['std_Deviation'], 'r')
 plt.plot(x, df['Slope_Upper'], 'g')
 plt.plot(x, df['Slope_Lower'], 'b')
 plt.title(slope)
 plt.show()
-
 
 
