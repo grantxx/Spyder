@@ -46,6 +46,10 @@ y7=df['Slope_Lower']
 y8=df['Slope_Lower']+(df['SLU_Min'].max()/3)
 y9=df['Slope_Upper']-(df['SLU_Max'].max()/3)
 
+_lower_quartile = len(x2[x2.Low <= x2.Slope_Lower+(df['SLU_Min'].max()/3)])
+_upper_quartile = len(x1[x1.High >= x1['Slope_Upper']-(x1['SLU_Max'].max()/3)].index)
+_total_record_count = len(df.index)
+
 # Plot the best fit line over the actual values
 #ax1.scatter(x, y, marker='.')
 ax1.scatter(x1.index, x1['High'], marker='.') #Plot only highs above std deviation line
@@ -58,6 +62,10 @@ plt.plot(x, y9, 'b--')
 plt.fill_between(x, y7,y8,color='lightslategrey',alpha=.55)
 plt.fill_between(x, y6,y9,color='burlywood',alpha=.5)
 plt.title('Linear Regression')
+ax1.text(0.7, 0.96,'Total count: ' + str(_total_record_count),fontsize=20, ha='left', va='center',transform=ax1.transAxes)
+ax1.text(0.7, 0.9,'Upper quartile count: ' + str(_upper_quartile),fontsize=20, ha='left', va='center',transform=ax1.transAxes)
+ax1.text(0.7, 0.84,'Lower quartile count: ' + str(_lower_quartile),fontsize=20, ha='left', va='center',transform=ax1.transAxes)
+
 plt.show()
 
 
