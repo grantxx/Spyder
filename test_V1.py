@@ -22,9 +22,10 @@ y = dfd['High']
 
 # Find the slope and intercept of the best fit line
 slope, intercept = np.polyfit(x, y, 1)
-
-#Find the slops and plce them into new columns
+#Place them into new columns
 dfd['std_Deviation'] = [slope * i + intercept for i in x]
+
+
 dfd['Slope_Upper'] = [(slope * i + intercept)+0.005 for i in x]
 dfd['Slope_Lower'] = [(slope * i + intercept)-0.005 for i in x]
     
