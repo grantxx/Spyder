@@ -9,10 +9,9 @@ from alpha_vantage.foreignexchange import ForeignExchange
 import matplotlib.pyplot as plt
 cc = ForeignExchange(key='OGRPFV5D58LC77OL',output_format='pandas')
 import pandas as pd
-from datetime import datetime
 import numpy as np
 from numpy.polynomial.polynomial import polyfit
-import statistics
+
 
 dfm = pd.DataFrame()
 dfw = pd.DataFrame()
