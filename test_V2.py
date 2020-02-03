@@ -10,10 +10,21 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 counter_i = 1
-
+fig = plt.figure(figsize=(40,20))
+fig.subplots_adjust(hspace=0.3)
+    
 def Create_Plot(df):
     x = df.index
     y = df['Mid']
+    
+    if counter_i == 1:
+        ChartHeader = 'Monthly'
+    elif counter_i == 2:
+        ChartHeader = 'Weekly'
+    elif counter_i == 3:
+        ChartHeader = 'Daily'
+    elif counter_i == 4:
+        ChartHeader = '4 Hour'
     
     # Find the slope and intercept of the best fit line
     slope, intercept = np.polyfit(x, y, 1)
@@ -41,14 +52,10 @@ def Create_Plot(df):
     _upper_quartile = len(x1[x1.High >= x1['Slope_Upper']-(x1['SLU_Max'].max()/3)].index)
     _total_record_count = len(df.index)
     
-    
-    #Set the main figure proportions
-    fig = plt.figure(figsize=(40,20))
-    fig.subplots_adjust(hspace=0.3)
-    ax = fig.add_subplot(221)  
 
-    
-    
+    ax = fig.add_subplot(2,2,counter_i)  
+
+        
     # Plot the best fit line over the actual values
     #ax1.scatter(x, y, marker='.') #Plot only highs above std deviation line
     ax.plot(x,df['std_Deviation'],'r--')
@@ -64,38 +71,44 @@ def Create_Plot(df):
     ax.plot(x, y9, 'b--')
     ax.fill_between(x, y7,y8,color='lightslategrey',alpha=.55)
     ax.fill_between(x, y6,y9,color='burlywood',alpha=.5)
-    ax.set_title('Weekly',fontsize=30)
+    ax.set_title(ChartHeader,fontsize=30)
     ax.text(0.7, 0.96,'Total count: ' + str(_total_record_count),fontsize=20, ha='left', va='center',transform=ax.transAxes)
     ax.text(0.7, 0.9,'Upper quartile count: ' + str(_upper_quartile),fontsize=20, ha='left', va='center',transform=ax.transAxes)
     ax.text(0.7, 0.84,'Lower quartile count: ' + str(_lower_quartile),fontsize=20, ha='left', va='center',transform=ax.transAxes)
     
-    # ax2.scatter(dfm.index, dfm['high'])
-    # ax2.set_title('Month',fontsize=30)
-    # ax3.scatter(dfw.index, dfw['high'])
-    # ax3.set_title('Weekly', fontsize=30)
-    # ax4.scatter(dfd.index, dfd['high'])
-    # ax4.set_title('Daily',fontsize=30)
-    plt.show()    
 
 cols=['Date', 'Time', 'Open','High','Low','Last']
 
-dfd = pd.read_csv('C:/SierraChart/Data/ed.txt',skipinitialspace=True, usecols=cols)
-dfd = dfd.tail(100)
-dfd.reset_index(inplace=True)
-dfd['Mid'] = (dfd['High'] + dfd['Low'])/2
+dfm = pd.read_csv('C:/SierraChart/Data/em.txt',skipinitialspace=True, usecols=cols)
+dfm = dfm.tail(17)
+dfm.reset_index(inplace=True)
+dfm['Mid'] = (dfm['High'] + dfm['Low'])/2
 
 
-dfw = pd.read_csv('C:/SierraChart/Data/euw.txt',skipinitialspace=True, usecols=cols)
+dfw = pd.read_csv('C:/SierraChart/Data/ew.txt',skipinitialspace=True, usecols=cols)
 dfw = dfw.tail(50)   
 dfw.reset_index(inplace=True)
 dfw['Mid'] = (dfw['High'] + dfw['Low'])/2
 
-DF_List = [dfw,dfd]
+dfd = pd.read_csv('C:/SierraChart/Data/ed.txt',skipinitialspace=True, usecols=cols)
+dfd = dfd.tail(80)   
+dfd.reset_index(inplace=True)
+dfd['Mid'] = (dfd['High'] + dfd['Low'])/2
+
+df4 = pd.read_csv('C:/SierraChart/Data/e4.txt',skipinitialspace=True, usecols=cols)
+df4 = df4.tail(136)   
+df4.reset_index(inplace=True)
+df4['Mid'] = (df4['High'] + df4['Low'])/2
+
+
+DF_List = [dfm,dfw, dfd, df4]#Add the dataframes to a list
 
 
 for i in DF_List: 
     Create_Plot(i) 
     counter_i += 1
+
+plt.show()   
     
 
 
